@@ -42,14 +42,24 @@ private:
 	UPROPERTY(Category = Camera, VisibleDefaultsOnly, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	class UCameraComponent* Camera;
 
-	/** Handle pressing forwards */
+
+	void AddForces();
+
+	void ApplyTurningForce();
+
+	void UpdateLocation();
+
+	void UpdateAirResistance();
+
 	void MoveForward(float Val);
-	/** Handle pressing right */
+
 	void MoveRight(float Val);
-	/** Handle handbrake pressed */
+
 
 	FVector Velocity;
 	FVector ForwardForce;
+	FVector AirResistance;
+	FQuat TurnForce;
 
 public:
 
@@ -57,7 +67,11 @@ public:
 	float Mass = 1000;
 
 	UPROPERTY(EditAnywhere)
-	float ForwardForceMagnitud = 10000;
+	float ForwardForceMagnitud = 1000;
 
+	UPROPERTY(EditAnywhere)
+	float RightForceMagnitud = 1;
 
+	UPROPERTY(EditAnywhere)
+	float AirResistanceCoeficient = 0.001f;
 };
