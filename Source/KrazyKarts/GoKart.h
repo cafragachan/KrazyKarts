@@ -43,7 +43,7 @@ private:
 	class UCameraComponent* Camera;
 
 
-	void AddForces();
+	void ApplyRollingResistance();
 
 	void ApplyTurningForce();
 
@@ -55,10 +55,13 @@ private:
 
 	void MoveRight(float Val);
 
+	void AddForces();
+
 
 	FVector Velocity;
 	FVector ForwardForce;
 	FVector AirResistance;
+	FVector RollingResistance;
 	FQuat TurnForce;
 
 public:
@@ -70,8 +73,11 @@ public:
 	float ForwardForceMagnitud = 1000;
 
 	UPROPERTY(EditAnywhere)
-	float RightForceMagnitud = 1;
+	float TurningRadius = 20;
 
 	UPROPERTY(EditAnywhere)
 	float AirResistanceCoeficient = 0.001f;
+
+	UPROPERTY(EditAnywhere)
+	float RollingResistanceCoeficient = 0.01f;
 };

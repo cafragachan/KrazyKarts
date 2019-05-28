@@ -55,6 +55,7 @@ void AGoKart::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	UpdateAirResistance();
+	ApplyRollingResistance();
 	ApplyTurningForce();
 	AddForces();
 	UpdateLocation();
@@ -69,11 +70,10 @@ void AGoKart::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 	PlayerInputComponent->BindAxis("MoveRight", this, &AGoKart::MoveRight);
 }
 
-void AGoKart::AddForces()
+void AGoKart::ApplyRollingResistance()
 {
-	FVector Acceleration = ForwardForce / Mass;
-	Velocity += Acceleration;
-	Velocity += AirResistance;
+	FVector NormalForce = (GetWorld()->GetGravityZ() / 100) * GetActorUpVector();
+	RollingResistance = - (NormalForce * RollingResistanceCoeficient).Size() * Velocity.GetSafeNormal();
 }
 
 void AGoKart::ApplyTurningForce()
@@ -99,6 +99,15 @@ void AGoKart::UpdateAirResistance()
 	AirResistance = FMath::Pow(Velocity.Size(), 2) * (Velocity.GetSafeNormal() * -1) * AirResistanceCoeficient;
 }
 
+void AGoKart::AddForces()
+{
+	FVector Acceleration = ForwardForce / Mass;
+	Velocity += Acceleration;
+	Velocity += AirResistance;
+	Velocity += RollingResistance;
+}
+
+
 void AGoKart::MoveForward(float Val)
 {
 	ForwardForce = GetActorForwardVector().GetSafeNormal() * ForwardForceMagnitud * Val;
@@ -106,6 +115,7 @@ void AGoKart::MoveForward(float Val)
 
 void AGoKart::MoveRight(float Val)
 {
-	TurnForce = FQuat(GetActorUpVector(), FMath::DegreesToRadians(RightForceMagnitud) * Val);
+	float DeltaPosition = FVector::DotProduct(GetActorForwardVector(), Velocity) * GetWorld()->DeltaTimeSeconds;
+	TurnForce = FQuat(GetActorUpVector(), DeltaPosition / TurningRadius * Val);
 }
 
